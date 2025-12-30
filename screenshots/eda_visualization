@@ -1,0 +1,50 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+
+# -----------------------------
+# Load Dataset
+# -----------------------------
+df = pd.read_csv("dataset/cleaned_student_performance.csv")
+
+os.makedirs("screenshots", exist_ok=True)
+
+# -----------------------------
+# Correlation Heatmap
+# -----------------------------
+plt.figure(figsize=(8, 6))
+sns.heatmap(df.corr(), annot=True, cmap="coolwarm")
+plt.title("Feature Correlation Heatmap")
+plt.tight_layout()
+plt.savefig("screenshots/correlation_heatmap.png")
+plt.close()
+
+# -----------------------------
+# Actual vs Predicted Plot
+# -----------------------------
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
+X = df[['attendance', 'study_hours', 'previous_marks']]
+y = df['final_marks']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+preds = model.predict(X_test)
+
+plt.figure(figsize=(7, 5))
+plt.scatter(y_test, preds)
+plt.xlabel("Actual Marks")
+plt.ylabel("Predicted Marks")
+plt.title("Actual vs Predicted Student Marks")
+plt.tight_layout()
+plt.savefig("screenshots/actual_vs_predicted.png")
+plt.close()
+
+print("✅ EDA visualizations saved in screenshots/")
